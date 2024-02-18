@@ -1,0 +1,6 @@
+@Nabs.Samples.GeneratedEndpointsApi_HostAddress = http://localhost:5062
+
+GET {{Nabs.Samples.GeneratedEndpointsApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
