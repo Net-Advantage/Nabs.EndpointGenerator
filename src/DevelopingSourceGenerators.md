@@ -83,21 +83,24 @@ Your should now be able to see the source generator under the `Analyzers` tab of
 
 The source generator pipeline is setup in the `Initialize` method of the source generator.
 
+It is good practice to define the source code as a string and then convert it to a `SourceText` object before adding it to the context.
+
 ```csharp
 public void Initialize(IncrementalGeneratorInitializationContext context)
 {
 	context.RegisterSourceOutput(context.Compilation.GetEntryPoint(context.CancellationToken), (context, cancellationToken) =>
 	{
-		var sourceBuilder = new StringBuilder();
-		sourceBuilder.AppendLine("using System;");
-		sourceBuilder.AppendLine("namespace Nabs.EndpointGenerator");
-		sourceBuilder.AppendLine("{");
-		sourceBuilder.AppendLine("	public class RequestEndpoint");
-		sourceBuilder.AppendLine("	{");
-		sourceBuilder.AppendLine("	}");
-		sourceBuilder.AppendLine("}");
+		var sourceTemplate = $$"""
+			using System;
+			namespace Nabs.EndpointGenerator
+			{
+				public class RequestEndpoint
+				{
+				}
+			}
+			""";
 
-		var sourceText = SourceText.From(sourceBuilder.ToString(), Encoding.UTF8);
+		var sourceText = SourceText.From(sourceTemplate, Encoding.UTF8);
 		context.AddSource("RequestEndpoint.cs", sourceText);
 	});
 }
