@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nabs.EndpointGenerator.Abstractions;
+using Nabs.EndpointGenerator.Helpers;
 using System.Text;
 
 namespace Nabs.EndpointGenerator;
@@ -8,72 +9,46 @@ namespace Nabs.EndpointGenerator;
 [Generator]
 public class RequestControllerGenerator : IIncrementalGenerator
 {
+    private readonly InitializeHelpers _initializeHelpers = new();
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+#if DEBUG
+        //System.Diagnostics.Debugger.Launch();
+#endif
+
         var compilationProvider = context.CompilationProvider;
         var classes = context.SyntaxProvider
-            .CreateSyntaxProvider(Predicate, Transform);
+            .CreateSyntaxProvider(
+                _initializeHelpers.Predicate,
+                _initializeHelpers.Transform);
 
         var compilationAndClasses = classes.Combine(compilationProvider);
 
         context.RegisterSourceOutput(compilationAndClasses, SourceOutputAction);
     }
 
-    private static bool Predicate(SyntaxNode node, CancellationToken cancellationToken)
-    {
-        if (node is ClassDeclarationSyntax classDeclaration)
-        {
-            var hasAttribute = classDeclaration.AttributeLists
-                .SelectMany(attrList => attrList.Attributes)
-                .Any(attr => attr.Name.ToString().EndsWith("RequestEndpointController"));
-
-            return hasAttribute;
-        }
-        return false;
-    }
-
-    private static ClassDeclarationSyntax Transform(
-        GeneratorSyntaxContext ctx,
-        CancellationToken cancellationToken)
-    {
-        return (ClassDeclarationSyntax)ctx.Node;
-    }
-
-    private static void SourceOutputAction(
+    private void SourceOutputAction(
         SourceProductionContext context,
         (ClassDeclarationSyntax classDeclarationSyntax, Compilation compilation) data)
     {
-        var requestEndpointAttribute = data.classDeclarationSyntax.AttributeLists
-            .SelectMany(attrList => attrList.Attributes)
-            .FirstOrDefault(attr => attr.Name.ToString().EndsWith("RequestEndpointController"));
+        var semanticModel = data.compilation.GetSemanticModel(data.classDeclarationSyntax.SyntaxTree);
+                
+        var assemblySymbol = GetAssemblyToScan(
+            _initializeHelpers.RequestEndpointControllerAttribute, 
+            semanticModel);
 
-
-        var referenceTypeArgument = requestEndpointAttribute.ArgumentList!
-            .Arguments.FirstOrDefault()!
-            .Expression.ToString()
-            .Trim('"');
-
-        var referencedAssemblyIdentity = data.compilation.ReferencedAssemblyNames
-            .FirstOrDefault(a => a.Name == referenceTypeArgument);
-
-        if (referencedAssemblyIdentity is null)
+        if (assemblySymbol is null)
         {
             return;
         }
 
-        var assemblySymbol = data.compilation.References
-                .Select(data.compilation.GetAssemblyOrModuleSymbol)
-                .OfType<IAssemblySymbol>()
-                .FirstOrDefault(a => a.Identity.Equals(referencedAssemblyIdentity));
-
         var actionMethods = new StringBuilder();
-
         if (assemblySymbol != null)
         {
             var namespaces = GetAllNamespaces(assemblySymbol.GlobalNamespace);
             foreach (var namespaceSymbol in namespaces)
             {
-                // Now you have the namespaces and can work with types within them
                 var namedTypeSymbols = GetPublicClassesImplementingIRequest(namespaceSymbol);
                 foreach (var namedTypeSymbol in namedTypeSymbols)
                 {
@@ -135,7 +110,7 @@ public class RequestControllerGenerator : IIncrementalGenerator
         };
 
         var sourceText = $$"""
-					[{{httpMethodAttribute}}(HttpVerb.{{httpVerb}}, "{{routeTemplate}}")]
+					[{{httpMethodAttribute}}("{{routeTemplate}}")]
 					public async Task<{{responseType}}> {{className}}Action({{fullyQualifiedName}} {{variableName}})
 					{
 						var response = await Mediator.Send({{variableName}});
@@ -260,16 +235,66 @@ public class RequestControllerGenerator : IIncrementalGenerator
                 // Assuming the first argument is the HttpVerb and the second is the endpoint template
                 if (attributeData.ConstructorArguments.Length >= 2)
                 {
-                    var httpVerb = Enum.IsDefined(typeof(HttpVerb), attributeData.ConstructorArguments[0].Value);
-                    var endpointTemplate = attributeData.ConstructorArguments[1].Value; // "person/{PersonId}" in your case
+                    _ = Enum.TryParse<HttpVerb>(attributeData.ConstructorArguments[0].Value!.ToString(), out var httpVerb);
+                    var endpointTemplate = attributeData.ConstructorArguments[1].Value!.ToString();
 
                     // Use the extracted information as needed
                     // For example, log the information, store it, or use it to generate code
-                    //return (httpVerb, endpointTemplate.ToString());
+                    return (httpVerb, endpointTemplate);
                 }
             }
         }
 
         return (HttpVerb.Get, "");
+    }
+
+    private static IAssemblySymbol? GetAssemblyToScan(AttributeSyntax attribute, SemanticModel semanticModel)
+    {
+        string name;
+        AssemblyIdentity? assemblyIdentity = null;
+
+        if (attribute is not null && attribute.ArgumentList is not null)
+        {
+
+            var genericName = attribute.Name as GenericNameSyntax;
+            if (genericName is not null)
+            {
+                var typeArgument = genericName.TypeArgumentList.Arguments.FirstOrDefault();
+                if (typeArgument is not null)
+                {
+                    var typeSymbol = semanticModel.GetTypeInfo(typeArgument).Type;
+                    if (typeSymbol is not null)
+                    {
+                        name = typeSymbol.ContainingAssembly.ToDisplayString();
+                        assemblyIdentity = semanticModel.Compilation.ReferencedAssemblyNames
+                            .FirstOrDefault(a => a.ToString() == name);
+                    }
+                }
+            }
+            else
+            {
+                if (attribute.ArgumentList.Arguments.Count > 0)
+                {
+                    name = attribute.ArgumentList.Arguments
+                        .First()
+                        .Expression.ToString()
+                        .Trim('"');
+
+                    assemblyIdentity = semanticModel.Compilation.ReferencedAssemblyNames
+                        .FirstOrDefault(a => a.Name == name);
+                }
+            }
+        }
+
+        if (assemblyIdentity is not null)
+        {
+            var result = semanticModel.Compilation.References
+                .Select(semanticModel.Compilation.GetAssemblyOrModuleSymbol)
+                .OfType<IAssemblySymbol>()
+                .FirstOrDefault(a => a.Identity.Equals(assemblyIdentity));
+            return result;
+        }
+
+        return null;
     }
 }

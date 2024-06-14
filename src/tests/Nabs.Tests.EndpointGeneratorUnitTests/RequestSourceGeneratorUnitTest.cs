@@ -19,8 +19,9 @@ namespace Nabs.Tests.EndpointGeneratorUnitTests
 			_output = output;
 		}
 
-		[Fact]
-		public void OutputTest()
+		[Theory]
+		[ResourceFileData(".Templates.RequestEndpoints.cstemplate")]
+        public void OutputTest(string templateSourceCode)
 		{
 			var assembly = Assembly.GetAssembly(typeof(GetPersonRequest))!;
 			var externalAssemblyReference = MetadataReference.CreateFromFile(assembly.Location);
@@ -28,28 +29,8 @@ namespace Nabs.Tests.EndpointGeneratorUnitTests
 			var assemblyAbstract = Assembly.GetAssembly(typeof(HttpVerb))!;
 			var assemblyAbstractReference = MetadataReference.CreateFromFile(assemblyAbstract.Location);
 
-			string sourceCode = """
-				using System;
-				using Nabs.EndpointGenerator.Abstractions;
-				using Nabs.Samples.BusinessLogic;
-
-				namespace Nabs.Samples.GeneratedEndpointsApi
-				{
-					[RequestEndpointController("Nabs.Samples.BusinessLogic")]
-					public partial class RequestEndpoints
-					{
-						//// create a sample endpoint
-						//[HttpGet("api/person")]
-						//public IActionResult GetPerson()
-						//{
-						//	return Ok(new Person { Id = 1, Name = "John Doe" });
-						//}
-					}
-				}
-				""";
-
 			// Parse the source code into a syntax tree
-			SyntaxTree sourceCodeSyntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
+			SyntaxTree sourceCodeSyntaxTree = CSharpSyntaxTree.ParseText(templateSourceCode);
 
 			CSharpCompilation compilation = CSharpCompilation.Create(assembly.FullName)
 				.WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))

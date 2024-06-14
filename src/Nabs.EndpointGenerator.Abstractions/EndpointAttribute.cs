@@ -9,13 +9,13 @@ public enum HttpVerb
 }
 
 [AttributeUsage(AttributeTargets.Method)]
-public class MethodToEndpointAttribute : Attribute
+public sealed class MethodEndpointAttribute : Attribute
 {
 
 }
 
 [AttributeUsage(AttributeTargets.Class)]
-public class ClassToEndpointsAttribute : Attribute
+public sealed class ClassEndpointsAttribute : Attribute
 {
 
 }
@@ -31,15 +31,4 @@ public class RequestEndpointAttribute : Attribute
 
 	public string HttpVerb { get; }
 	public string Template { get; }
-}
-
-[AttributeUsage(AttributeTargets.Class)]
-public class RequestEndpointControllerAttribute : Attribute
-{
-	public RequestEndpointControllerAttribute(string assemblyToScan)
-	{
-		AssemblyToScan = assemblyToScan;
-	}
-
-	public string AssemblyToScan { get; }
 }
