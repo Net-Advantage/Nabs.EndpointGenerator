@@ -36,7 +36,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Nabs.EndpointGenerator\Nabs.EndpointGenerator.csproj" />
-		<ProjectReference Include="..\..\samples\Nabs.Samples.BusinessLogic\Nabs.Samples.BusinessLogic.csproj" />
+		<ProjectReference Include="..\..\samples\Nabs.Samples.BusinessLogic.PersonDomain\Nabs.Samples.BusinessLogic.PersonDomain.csproj" />
+		<ProjectReference Include="..\..\sample\Nabs.Samples.BusinessLogic.CompanyDomain\Nabs.Samples.BusinessLogic.CompanyDomain.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

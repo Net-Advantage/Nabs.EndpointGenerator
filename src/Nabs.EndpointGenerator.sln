@@ -19,11 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nabs.Samples.GeneratedEndpo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nabs.EndpointGenerator.Abstractions", "Nabs.EndpointGenerator.Abstractions\Nabs.EndpointGenerator.Abstractions.csproj", "{A6C410A0-1279-41A3-8A9B-544EBF86A1FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nabs.Samples.BusinessLogic", "samples\Nabs.Samples.BusinessLogic\Nabs.Samples.BusinessLogic.csproj", "{C89C62DB-DD85-4B0A-811A-5ACED3F3B9DD}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BAB1D55E-CE2F-4BA5-A07F-9347212C8C11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nabs.Tests.EndpointGeneratorUnitTests", "tests\Nabs.Tests.EndpointGeneratorUnitTests\Nabs.Tests.EndpointGeneratorUnitTests.csproj", "{291DE37B-4973-455B-91AA-7F2E3BFA68D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nabs.Tests.EndpointGeneratorUnitTests", "tests\Nabs.Tests.EndpointGeneratorUnitTests\Nabs.Tests.EndpointGeneratorUnitTests.csproj", "{291DE37B-4973-455B-91AA-7F2E3BFA68D8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nabs.Samples.BusinessLogic.PersonDomain", "samples\Nabs.Samples.BusinessLogic.PersonDomain\Nabs.Samples.BusinessLogic.PersonDomain.csproj", "{A8BD77F9-78CD-46EE-B71A-75882E471365}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nabs.Samples.BusinessLogic.CompanyDomain", "sample\Nabs.Samples.BusinessLogic.CompanyDomain\Nabs.Samples.BusinessLogic.CompanyDomain.csproj", "{EE328BB2-0EEB-4309-9457-902156A5636C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,22 +45,27 @@ Global
 		{A6C410A0-1279-41A3-8A9B-544EBF86A1FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6C410A0-1279-41A3-8A9B-544EBF86A1FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6C410A0-1279-41A3-8A9B-544EBF86A1FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C89C62DB-DD85-4B0A-811A-5ACED3F3B9DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C89C62DB-DD85-4B0A-811A-5ACED3F3B9DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C89C62DB-DD85-4B0A-811A-5ACED3F3B9DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C89C62DB-DD85-4B0A-811A-5ACED3F3B9DD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{291DE37B-4973-455B-91AA-7F2E3BFA68D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{291DE37B-4973-455B-91AA-7F2E3BFA68D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{291DE37B-4973-455B-91AA-7F2E3BFA68D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{291DE37B-4973-455B-91AA-7F2E3BFA68D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8BD77F9-78CD-46EE-B71A-75882E471365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8BD77F9-78CD-46EE-B71A-75882E471365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8BD77F9-78CD-46EE-B71A-75882E471365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8BD77F9-78CD-46EE-B71A-75882E471365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE328BB2-0EEB-4309-9457-902156A5636C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE328BB2-0EEB-4309-9457-902156A5636C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE328BB2-0EEB-4309-9457-902156A5636C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE328BB2-0EEB-4309-9457-902156A5636C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F1BD22C1-C39B-45C5-802D-D916274E7C94} = {DDFC3987-2C47-49A0-9567-55838CEE153F}
-		{C89C62DB-DD85-4B0A-811A-5ACED3F3B9DD} = {DDFC3987-2C47-49A0-9567-55838CEE153F}
 		{291DE37B-4973-455B-91AA-7F2E3BFA68D8} = {BAB1D55E-CE2F-4BA5-A07F-9347212C8C11}
+		{A8BD77F9-78CD-46EE-B71A-75882E471365} = {DDFC3987-2C47-49A0-9567-55838CEE153F}
+		{EE328BB2-0EEB-4309-9457-902156A5636C} = {DDFC3987-2C47-49A0-9567-55838CEE153F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6BAF0BCE-30DD-488F-BAFD-0CAF694C7F80}

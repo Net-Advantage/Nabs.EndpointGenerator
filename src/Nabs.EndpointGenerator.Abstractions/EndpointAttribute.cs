@@ -1,22 +1,22 @@
 ﻿namespace Nabs.EndpointGenerator.Abstractions;
 
-[AttributeUsage(AttributeTargets.Method)]
-public sealed class MethodEndpointAttribute : Attribute
-{
-
-}
-
-[AttributeUsage(AttributeTargets.Class)]
-public sealed class ClassEndpointsAttribute : Attribute
-{
-
-}
-
-[AttributeUsage(AttributeTargets.Class)]
-public class HttpGetEndpointAttribute : Attribute
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public class HttpGetEndpointAttribute : HttpEndpointAttribute
 {
 	public HttpGetEndpointAttribute(string template)
 	{
 		_ = template;
 	}
 }
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public class HttpPostEndpointAttribute : HttpEndpointAttribute
+{
+    public HttpPostEndpointAttribute(string template)
+    {
+        _ = template;
+    }
+}
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public abstract class HttpEndpointAttribute : Attribute;

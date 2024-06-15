@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace Nabs.Samples.BusinessLogic.GetPerson;
+﻿namespace Nabs.Samples.BusinessLogic.PersonDomain.GetPerson;
 
 public sealed class GetPersonRequestHandler : IRequestHandler<GetPersonRequest, GetPersonResponse>
 {
@@ -8,7 +6,8 @@ public sealed class GetPersonRequestHandler : IRequestHandler<GetPersonRequest, 
     {
         var result = new GetPersonResponse
         {
-            Value = "The Value"
+            PersonId = request.PersonId,
+            Username = $"Username {request.PersonId}"
         };
 
         return await Task.FromResult(result);

@@ -11,14 +11,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Nabs.Samples.BusinessLogic\Nabs.Samples.BusinessLogic.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference 
-			Include="..\..\Nabs.EndpointGenerator\Nabs.EndpointGenerator.csproj" 
-			OutputItemType="Analyzer" 
-			ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Nabs.EndpointGenerator\Nabs.EndpointGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\sample\Nabs.Samples.BusinessLogic.CompanyDomain\Nabs.Samples.BusinessLogic.CompanyDomain.csproj" />
+		<ProjectReference Include="..\Nabs.Samples.BusinessLogic.PersonDomain\Nabs.Samples.BusinessLogic.PersonDomain.csproj" />
 	</ItemGroup>
 
 </Project>

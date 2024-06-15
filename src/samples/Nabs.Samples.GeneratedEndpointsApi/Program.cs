@@ -1,10 +1,9 @@
-using Nabs.Samples.BusinessLogic;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMediatR(config =>
 {
-	config.RegisterServicesFromAssemblyContaining<Person>();
+	config.RegisterServicesFromAssemblyContaining<Nabs.Samples.BusinessLogic.PersonDomain.Root>();
+    config.RegisterServicesFromAssemblyContaining<Nabs.Samples.BusinessLogic.CompanyDomain.Root>();
 });
 
 builder.Services.AddEndpointsApiExplorer();

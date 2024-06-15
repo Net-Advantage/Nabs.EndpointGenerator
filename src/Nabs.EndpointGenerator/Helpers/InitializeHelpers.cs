@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Nabs.EndpointGenerator.Helpers;
 
-internal class InitializeHelpers
+internal static class InitializeHelpers
 {
     private static readonly string[] _attributeNames =
         [
@@ -13,36 +13,28 @@ internal class InitializeHelpers
         "GenerateEndpointsAttribute`1"
         ];
 
-    public AttributeSyntax RequestEndpointControllerAttribute { get; private set; } = default!;
-
-    internal bool Predicate(SyntaxNode node, CancellationToken cancellationToken)
+    internal static bool Predicate(SyntaxNode node, CancellationToken cancellationToken)
     {
         if (node is ClassDeclarationSyntax classDeclaration)
         {
             var hasAttribute = classDeclaration.AttributeLists
                 .SelectMany(attrList => attrList.Attributes)
-                .Any(IsRequestEndpointControllerAttribute);
+                .Any(IsGenerateEndpointsAttribute);
 
             return hasAttribute;
         }
         return false;
     }
 
-    internal ClassDeclarationSyntax Transform(
+    internal static ClassDeclarationSyntax Transform(
         GeneratorSyntaxContext ctx,
         CancellationToken cancellationToken)
     {
         var result = (ClassDeclarationSyntax)ctx.Node;
-
-        RequestEndpointControllerAttribute = result.AttributeLists
-            .SelectMany(attrList => attrList.Attributes)
-            .FirstOrDefault(IsRequestEndpointControllerAttribute)
-            ?? throw new InvalidOperationException("Missing RequestEndpointControllerAttribute should not happen!");
-
         return result;
     }
 
-    private static bool IsRequestEndpointControllerAttribute(AttributeSyntax attributeSyntax)
+    public static bool IsGenerateEndpointsAttribute(AttributeSyntax attributeSyntax)
     {
         string attributeName = attributeSyntax.Name switch
         {

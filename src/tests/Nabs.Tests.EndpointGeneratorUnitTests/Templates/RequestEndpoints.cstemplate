@@ -4,15 +4,15 @@ using Nabs.Samples.BusinessLogic;
 
 namespace Nabs.Samples.GeneratedEndpointsApi
 {
-	//[RequestEndpointController("Nabs.Samples.BusinessLogic")]
-	[GenerateEndpoints<Nabs.Samples.BusinessLogic.Person>()]
-	public partial class RequestEndpoints
+	[GenerateEndpoints<Nabs.Samples.BusinessLogic.PersonDomain.Root>()]
+	public partial class PersonDomainEndpoints
 	{
-		// create a sample endpoint
-		[HttpGet("api/person")]
-		public IActionResult GetPerson()
-		{
-			return Ok(new Person { Id = 1, Name = "John Doe" });
-		}
+		
+	}
+
+	[GenerateEndpoints<Nabs.Samples.BusinessLogic.CompanyDomain.Root>()]
+	public partial class CompanyDomainEndpoints
+	{
+		
 	}
 }
