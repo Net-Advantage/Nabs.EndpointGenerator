@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nabs.EndpointGenerator.Helpers;
 using System.Text;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace Nabs.EndpointGenerator;
 
@@ -32,9 +31,7 @@ public class RequestControllerGenerator : IIncrementalGenerator
 
         var requestEndpointControllerAttribute = data.classDeclarationSyntax.AttributeLists
             .SelectMany(attrList => attrList.Attributes)
-            .First(InitializeHelpers.IsGenerateEndpointsAttribute)
-            ?? throw new InvalidOperationException("Missing RequestEndpointControllerAttribute should not happen!");
-
+            .First(InitializeHelpers.IsGenerateEndpointsAttribute);
 
         var assemblySymbol = GetAssemblyToScan(
             requestEndpointControllerAttribute,
@@ -54,7 +51,7 @@ public class RequestControllerGenerator : IIncrementalGenerator
                 var namedTypeSymbols = GetPublicClassesImplementingIRequest(namespaceSymbol);
                 foreach (var namedTypeSymbol in namedTypeSymbols)
                 {
-                    var actionMethod = CreateActionMethod(context, namedTypeSymbol);
+                    var actionMethod = CreateActionMethod(context, data.classDeclarationSyntax, namedTypeSymbol);
                     actionMethods.AppendLine(actionMethod);
                 }
             }
@@ -89,6 +86,7 @@ namespace {namespaceName}
 
     private static string CreateActionMethod(
         SourceProductionContext ctx,
+        ClassDeclarationSyntax classDeclarationSyntax,
         INamedTypeSymbol namedTypeSymbol)
     {
         _ = ctx;
@@ -102,10 +100,10 @@ namespace {namespaceName}
 
         var sourceText = attributeData!.AttributeClass!.Name switch
         {
-            "HttpGetEndpointAttribute" => namedTypeSymbol.BuildHttpGetActionMethod(attributeData),
-            "HttpPostEndpointAttribute" => namedTypeSymbol.BuildHttpPostActionMethod(attributeData),
-            "HttpPushEndpointAttribute" => namedTypeSymbol.BuildHttpPushActionMethod(attributeData),
-            "HttpDeleteEndpointAttribute" => namedTypeSymbol.BuildHttpDeleteActionMethod(attributeData),
+            "HttpGetEndpointAttribute" => namedTypeSymbol.BuildHttpGetActionMethod(classDeclarationSyntax, attributeData),
+            "HttpPostEndpointAttribute" => namedTypeSymbol.BuildHttpPostActionMethod(classDeclarationSyntax, attributeData),
+            "HttpPushEndpointAttribute" => namedTypeSymbol.BuildHttpPushActionMethod(classDeclarationSyntax, attributeData),
+            "HttpDeleteEndpointAttribute" => namedTypeSymbol.BuildHttpDeleteActionMethod(classDeclarationSyntax, attributeData),
             _ => string.Empty
         };
 
