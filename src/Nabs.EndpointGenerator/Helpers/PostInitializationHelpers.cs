@@ -1,11 +1,14 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
-
 namespace Nabs.EndpointGenerator.Helpers;
 
 internal static class PostInitializationHelpers
 {
-    public static void SourceOutputAction(IncrementalGeneratorPostInitializationContext context)
+    internal static void InitializeGenerator(
+        IncrementalGeneratorInitializationContext context)
+    {
+        context.RegisterPostInitializationOutput(SourceOutputAction);
+    }
+
+    private static void SourceOutputAction(IncrementalGeneratorPostInitializationContext context)
     {
         var source = @"
 using System;

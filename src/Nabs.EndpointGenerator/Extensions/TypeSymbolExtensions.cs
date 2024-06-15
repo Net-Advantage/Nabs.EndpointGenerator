@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-
-namespace Nabs.EndpointGenerator.Helpers;
+﻿namespace Nabs.EndpointGenerator.Extensions;
 
 public static class TypeSymbolExtensions
 {
