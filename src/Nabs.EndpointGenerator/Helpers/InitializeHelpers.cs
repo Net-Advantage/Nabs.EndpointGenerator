@@ -7,8 +7,10 @@ internal class InitializeHelpers
 {
     private static readonly string[] _attributeNames =
         [
-        "RequestEndpointController",
-        "RequestEndpointController`1"
+        "GenerateEndpoints",
+        "GenerateEndpoints`1",
+        "GenerateEndpointsAttribute",
+        "GenerateEndpointsAttribute`1"
         ];
 
     public AttributeSyntax RequestEndpointControllerAttribute { get; private set; } = default!;

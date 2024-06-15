@@ -2,5 +2,5 @@
 
 public class GetPersonResponse
 {
-
+    public string Value { get; set; } = "";
 }

@@ -5,7 +5,7 @@ using Nabs.Samples.BusinessLogic;
 namespace Nabs.Samples.GeneratedEndpointsApi
 {
 	//[RequestEndpointController("Nabs.Samples.BusinessLogic")]
-	[RequestEndpointController<Nabs.Samples.BusinessLogic.Person>()]
+	[GenerateEndpoints<Nabs.Samples.BusinessLogic.Person>()]
 	public partial class RequestEndpoints
 	{
 		// create a sample endpoint

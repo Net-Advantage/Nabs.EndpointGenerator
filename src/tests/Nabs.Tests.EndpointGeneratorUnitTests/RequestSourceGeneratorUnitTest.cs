@@ -26,7 +26,7 @@ namespace Nabs.Tests.EndpointGeneratorUnitTests
 			var assembly = Assembly.GetAssembly(typeof(GetPersonRequest))!;
 			var externalAssemblyReference = MetadataReference.CreateFromFile(assembly.Location);
 
-			var assemblyAbstract = Assembly.GetAssembly(typeof(HttpVerb))!;
+			var assemblyAbstract = Assembly.GetAssembly(typeof(HttpGetEndpointAttribute))!;
 			var assemblyAbstractReference = MetadataReference.CreateFromFile(assemblyAbstract.Location);
 
 			// Parse the source code into a syntax tree

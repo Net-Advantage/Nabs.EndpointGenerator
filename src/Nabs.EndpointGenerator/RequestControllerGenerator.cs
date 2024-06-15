@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Nabs.EndpointGenerator.Abstractions;
 using Nabs.EndpointGenerator.Helpers;
 using System.Text;
 
@@ -13,10 +12,6 @@ public class RequestControllerGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-#if DEBUG
-        //System.Diagnostics.Debugger.Launch();
-#endif
-
         var compilationProvider = context.CompilationProvider;
         var classes = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -26,6 +21,8 @@ public class RequestControllerGenerator : IIncrementalGenerator
         var compilationAndClasses = classes.Combine(compilationProvider);
 
         context.RegisterSourceOutput(compilationAndClasses, SourceOutputAction);
+
+        context.RegisterPostInitializationOutput(PostInitializationHelpers.SourceOutputAction);
     }
 
     private void SourceOutputAction(
@@ -33,9 +30,9 @@ public class RequestControllerGenerator : IIncrementalGenerator
         (ClassDeclarationSyntax classDeclarationSyntax, Compilation compilation) data)
     {
         var semanticModel = data.compilation.GetSemanticModel(data.classDeclarationSyntax.SyntaxTree);
-                
+
         var assemblySymbol = GetAssemblyToScan(
-            _initializeHelpers.RequestEndpointControllerAttribute, 
+            _initializeHelpers.RequestEndpointControllerAttribute,
             semanticModel);
 
         if (assemblySymbol is null)
@@ -62,28 +59,28 @@ public class RequestControllerGenerator : IIncrementalGenerator
         var className = data.classDeclarationSyntax.Identifier.Text;
         var namespaceName = GetNamespace(data.classDeclarationSyntax);
 
-        var sourceText = $$"""
-			// Generated @ {{now}}
-			using System;
-			using Microsoft.AspNetCore.Mvc;
-			
-			namespace {{namespaceName}}
-			{
-				public partial class {{className}}
-				{
-					public {{className}}(MediatR.IMediator mediator)
-					{
-						Mediator = mediator;
-					}
+        var source = $@"
+using System;
+using Microsoft.AspNetCore.Mvc;
 
-					public MediatR.IMediator Mediator { get; }
-					
-			{{actionMethods}}
-				}
-			}
-			""";
+namespace {namespaceName}
+{{
+    public partial class {className}
+    {{
+        public {className}(MediatR.IMediator mediator)
+        {{
+        	Mediator = mediator;
+        }}
 
-        context.AddSource($"{className}.g.cs", sourceText);
+        public MediatR.IMediator Mediator {{ get; }}
+
+        {actionMethods}
+    }}
+}}
+";
+
+        context.AddSource($"{className}.g.cs", source);
+        //context.AddSource($"Test.g.cs", $@"// Generated ");
     }
 
     private static string CreateActionMethod(
@@ -96,27 +93,20 @@ public class RequestControllerGenerator : IIncrementalGenerator
         var fullyQualifiedName = GetFullyQualifiedName(namedTypeSymbol);
         var variableName = "request";
         var responseType = GetResponseType(namedTypeSymbol);
-        var (httpVerb, routeTemplate) = ExtractRequestEndpointAttributeArguments(namedTypeSymbol);
+        var routeTemplate = ExtractTemplateFromHttpAttributeArguments(namedTypeSymbol);
 
-        ;
+        //TODO: get the correct http method attribute for the right verb.
 
-        var httpMethodAttribute = httpVerb switch
-        {
-            HttpVerb.Get => "HttpGet",
-            HttpVerb.Post => "HttpPost",
-            HttpVerb.Put => "HttpPut",
-            HttpVerb.Delete => "HttpDelete",
-            _ => "HttpGet"
-        };
+        var httpMethodAttribute = "HttpGet";
 
-        var sourceText = $$"""
-					[{{httpMethodAttribute}}("{{routeTemplate}}")]
-					public async Task<{{responseType}}> {{className}}Action({{fullyQualifiedName}} {{variableName}})
-					{
-						var response = await Mediator.Send({{variableName}});
-						return response;
-					}
-			""";
+        var sourceText = $@"
+        [{httpMethodAttribute}(""{routeTemplate}"")]
+        public async Task<{responseType}> {className}Action([FromRoute]{fullyQualifiedName} {variableName})
+        {{
+            var response = await Mediator.Send({variableName});
+            return response;
+        }}
+";
 
         return sourceText;
     }
@@ -220,32 +210,29 @@ public class RequestControllerGenerator : IIncrementalGenerator
         return string.Empty; // Or any default namespace indication as per your use case
     }
 
-    public static (HttpVerb HttpVerb, string RouteTemplate) ExtractRequestEndpointAttributeArguments(INamedTypeSymbol namedTypeSymbol)
+    public static string ExtractTemplateFromHttpAttributeArguments(INamedTypeSymbol namedTypeSymbol)
     {
-        var a = namedTypeSymbol.DeclaringSyntaxReferences;
-
-
         // Iterate through the attributes of the class
         foreach (var attributeData in namedTypeSymbol.GetAttributes())
         {
             // Check if the attribute is the one you're interested in (RequestEndpoint in this case)
-            if (attributeData.AttributeClass!.ToDisplayString().EndsWith(".RequestEndpointAttribute"))
+            var a = attributeData.AttributeClass!.ToDisplayString();
+            if (attributeData.AttributeClass!.ToDisplayString().EndsWith(".HttpGetEndpointAttribute"))
             {
                 // Extract the constructor arguments
                 // Assuming the first argument is the HttpVerb and the second is the endpoint template
-                if (attributeData.ConstructorArguments.Length >= 2)
+                if (attributeData.ConstructorArguments.Length >= 1)
                 {
-                    _ = Enum.TryParse<HttpVerb>(attributeData.ConstructorArguments[0].Value!.ToString(), out var httpVerb);
-                    var endpointTemplate = attributeData.ConstructorArguments[1].Value!.ToString();
+                    var endpointTemplate = attributeData.ConstructorArguments[0].Value!.ToString();
 
                     // Use the extracted information as needed
                     // For example, log the information, store it, or use it to generate code
-                    return (httpVerb, endpointTemplate);
+                    return endpointTemplate;
                 }
             }
         }
 
-        return (HttpVerb.Get, "");
+        return "";
     }
 
     private static IAssemblySymbol? GetAssemblyToScan(AttributeSyntax attribute, SemanticModel semanticModel)

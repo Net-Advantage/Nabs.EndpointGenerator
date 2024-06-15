@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
 
-namespace Nabs.Samples.BusinessLogic.GetPerson
+namespace Nabs.Samples.BusinessLogic.GetPerson;
+
+public sealed class GetPersonRequestHandler : IRequestHandler<GetPersonRequest, GetPersonResponse>
 {
-    internal class GetPersonRequestHandler
+    public async Task<GetPersonResponse> Handle(GetPersonRequest request, CancellationToken cancellationToken)
     {
+        var result = new GetPersonResponse
+        {
+            Value = "The Value"
+        };
+
+        return await Task.FromResult(result);
     }
 }
